@@ -16,13 +16,17 @@ export default async function handler(req, res) {
   try {
     const response = await fetch(targetUrl);
     const contentType = response.headers.get('content-type') || 'application/json';
-    const body = await response.text();
 
     res.setHeader('Content-Type', contentType);
-    return res.status(200).send(body);
+
+    if (contentType.includes('application/json')) {
+      const json = await response.json();
+      return res.status(200).json(json);
+    } else {
+      const text = await response.text();
+      return res.status(200).send(text);
+    }
   } catch (error) {
     return res.status(500).json({ error: 'Failed to fetch from target URL' });
   }
 }
-
-  
